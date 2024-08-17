@@ -1,0 +1,55 @@
+from os import getenv
+
+from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+
+Base = declarative_base()
+
+
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tid = Column(Integer, nullable=False)  # bigint заменен на Integer
+    name = Column(String(255))  # tinytext
+    faculty = Column(Integer, nullable=False)
+    group = Column(Integer, nullable=False)
+
+    marked_schedules = relationship("MarkedSchedule", back_populates="user")
+
+
+class MarkedSchedule(Base):
+    __tablename__ = 'marked_schedule'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    name = Column(String(255), nullable=False)  # tinytext
+    href = Column(String(255), nullable=False)  # tinytext
+    type = Column(String(255), nullable=False)  # tinytext
+
+    user = relationship("User", back_populates="marked_schedules")
+
+
+class Database:
+    def __init__(self):
+        self.session = None
+
+    def db_reconnect(self):
+        try:
+            self.session.close()
+        except Exception as e:
+            pass
+        engine = create_engine(
+            f'mysql+pymysql://{getenv('DB_USER')}:{getenv('DB_PASSWORD')}@{getenv('DB_HOST')}/{getenv('DB_NAME')}')
+        Session = sessionmaker(bind=engine)
+        self.session = Session()
+
+    def get_user_by_tid(self, tid: int) -> User:
+        self.db_reconnect()
+        return self.session.query(User).filter_by(tid=tid).first()
+
+    def create_new_user(self, tid: int, faculty: int, group: int):
+        self.db_reconnect()
+        self.session.add(User(tid=tid, faculty=faculty, group=group))
+        self.session.commit()

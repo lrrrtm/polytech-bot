@@ -3,10 +3,8 @@ from requests import get
 
 
 def get_groups_list(search_query: str) -> list:
-    x = f"https://ruz.spbstu.ru/search/groups?q={search_query}"
-    print(x)
     try:
-        data = get(url=f"https://ruz.spbstu.ru/search/groups?q={search_query}", timeout=3)
+        data = get(url=f"https://ruz.spbstu.ru/search/groups?q={search_query}", timeout=10)
     except Exception as e:
         return [None]
 
@@ -24,5 +22,6 @@ def get_groups_list(search_query: str) -> list:
         )
 
     return result_data
+
 
 print(get_groups_list('5132704'))
