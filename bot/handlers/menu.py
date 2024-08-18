@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from bot.keyboards.menu import get_menu_kb
+from bot.keyboards.menu import get_menu_kb, get_back_btn_kb
 from bot.keyboards.schedule import get_schedule_kb
 from bot.lexicon import phrases
 from bot.states.menu import MenuItem
@@ -31,11 +31,18 @@ async def main_menu_item_selected(message: Message, state: FSMContext):
             text=message.text,
             reply_markup=get_schedule_kb()
         )
+
     elif message.text == "🧑‍🏫 Поиск препода":
         await state.set_state(TeacherSchedule.waiting_name_for_find)
-        await message.answer("<b>🧑‍🏫 Поиск преподавателя</b>"
-                             "\n\nЗдесь ты можешь определить, где находится преподаватель согласно его расписанию."
-                             "\n\nДля этого отправь фамилию или полное ФИО преподавателя.")
+        await message.answer(
+            text="<b>🧑‍🏫 Поиск преподавателя</b>"
+                 "\n\nЗдесь ты можешь определить, где находится преподаватель согласно его расписанию."
+                 "\n\nДля этого отправь фамилию или полное ФИО преподавателя.",
+            reply_markup=get_back_btn_kb()
+        )
+
+    elif message.text == "🏢 Корпуса":
+
 
 
 @router.message(MenuItem.waiting_for_schedule_menu)

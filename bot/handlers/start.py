@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardRemove
 
-from bot.keyboards.groups import get_groups_list_kb
+from bot.keyboards.groups import get_buttons_list
 from bot.lexicon import phrases
 from bot.utils.ruz.lists import get_groups_list
 from models.database import Database
@@ -12,7 +12,6 @@ from bot.states.registration import InputGroupNum
 router = Router()
 
 db = Database()
-
 
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
@@ -35,7 +34,7 @@ async def search_group(message: Message, state: FSMContext):
             await state.set_state(InputGroupNum.waiting_for_select)
             await message.answer(
                 text="Нашлось несколько групп, выбери свою из списка",
-                reply_markup=get_groups_list_kb(groups_list)
+                reply_markup=get_buttons_list(groups_list)
             )
 
     else:

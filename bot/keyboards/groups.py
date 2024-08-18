@@ -2,10 +2,10 @@ from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
-def get_groups_list_kb(groups_list: list) -> ReplyKeyboardMarkup:
+def get_buttons_list(data: list) -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
-    for group in groups_list:
-        builder.button(text=group['name'])
+    for element in data:
+        builder.button(text=element['name'])
 
     builder.adjust(1)
 

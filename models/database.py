@@ -19,6 +19,15 @@ class User(Base):
     marked_schedules = relationship("MarkedSchedule", back_populates="user")
 
 
+class Location(Base):
+    __tablename__ = 'locations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(255), nullable=False)  # tinytext
+    caption = Column(String(300), nullable=False)  # tinytext
+    yandex_maps_id = Column(String(300), nullable=False)  # tinytext
+
+
 class MarkedSchedule(Base):
     __tablename__ = 'marked_schedule'
 
@@ -53,3 +62,7 @@ class Database:
         self.db_reconnect()
         self.session.add(User(tid=tid, faculty=faculty, group=group))
         self.session.commit()
+
+    def get_place_info(self, place_name) -> Location:
+        self.db_reconnect()
+        return self.session.query(Location).filter_by(name=place_name).first()

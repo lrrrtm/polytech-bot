@@ -32,6 +32,7 @@ def get_week_schedule(type: str, params: dict, date: datetime.date) -> dict:
         'response': True,
         'general_info': {
             'name': soup.find('li', attrs={'class': 'breadcrumb-item active'}).text,
+            'url': url
         },
         'schedule': {}
     }
@@ -45,6 +46,7 @@ def get_week_schedule(type: str, params: dict, date: datetime.date) -> dict:
 
             cur_day = soup.find('div', attrs={'class': 'schedule__date'}).text[:2]
             cur_day_date = datetime.datetime.strptime(f'{date.year}-{date.month}-{cur_day}', '%Y-%m-%d')
+            # cur_day_date = datetime.date(year=date.year, month=date.month, day=int(cur_day))
             lessons = soup.find_all('li', attrs={'class': 'lesson'})
 
             formatted_day_schedule = []
@@ -68,24 +70,35 @@ def get_week_schedule(type: str, params: dict, date: datetime.date) -> dict:
                 }
                 data['places'] = soup.find('div', attrs={'class': 'lesson__places'}).text
                 formatted_day_schedule.append(data)
-            result_data['schedule'][cur_day_date] = formatted_day_schedule
+            result_data['schedule'][cur_day_date.date()] = formatted_day_schedule
 
         return result_data
 
 
-# Пример использования
-# для препода
-data = get_week_schedule(
-    type="teacher",
-    params={'teacher_id': 8289},
-    date=datetime.date(year=2024, month=9, day=2)
-)
-print(data)
+def get_teacher_location(teacher_id: int):
+    # current_date = datetime.datetime.now().date()
+    current_date = datetime.datetime(year=2024, month=9, day=2, hour=9, minute=0)
+    schedule = get_week_schedule(
+        type="teacher",
+        params={'teacher_id': teacher_id},
+        date=current_date
+    )
 
-# для группы
-data = get_week_schedule(
-    type="group",
-    params={'faculty': 125, 'groups': 40518},
-    date=datetime.date(year=2024, month=9, day=2)
-)
-print(data)
+    if schedule['response']:  # запрос выполнен
+        result = {'status': 'empty', 'lesson': None, 'teacher_name': schedule['general_info']['name'], 'url': schedule['general_info']['url']}
+
+        if current_date.date() in schedule['schedule'].keys():  # сегодня есть занятия
+            today_schedule = schedule['schedule'][current_date.date()]
+
+            for lesson in today_schedule:
+                if current_date < lesson['time']['start']:  # будет занятие
+                    result['status'] = 'upcoming'
+                    result['lesson'] = lesson
+                    break
+                elif lesson['time']['start'] <= current_date < lesson['time']['end']:
+                    result['status'] = 'running'
+                    result['lesson'] = lesson
+                    break
+        return True, result
+    else:
+        return False, {}

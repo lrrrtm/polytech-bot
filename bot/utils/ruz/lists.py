@@ -32,7 +32,7 @@ def get_groups_list(search_query: str) -> list:
     return result_data
 
 
-def get_teachers_list(search_query: str) -> list:
+def get_teachers_list(search_query: str):
     """
         Поиск преподавателей по значению search_query
         :param search_query: строка поиска
@@ -42,7 +42,7 @@ def get_teachers_list(search_query: str) -> list:
     try:
         data = get(url=f"https://ruz.spbstu.ru/search/teacher?q={search_query}", timeout=3)
     except Exception as e:
-        return [None]
+        return False, []
 
     soup = BeautifulSoup(data.text, "html.parser")
     teachers_list = soup.find_all("a", {"class": "search-result__link"})
@@ -56,7 +56,7 @@ def get_teachers_list(search_query: str) -> list:
             }
         )
 
-    return result_data
+    return True, result_data
 
 
 # Пример использования
