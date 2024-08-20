@@ -40,6 +40,16 @@ class MarkedSchedule(Base):
     user = relationship("User", back_populates="marked_schedules")
 
 
+class Notifications(Base):
+    __tablename__ = 'notifications'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tid = Column(Integer, ForeignKey('users.id'), nullable=False)
+    schedule_corrections = Column(String(1), nullable=False, default='1')  # tinytext
+    schedule_notify = Column(String(1), nullable=False, default='1')  # tinytext
+    service_msgs = Column(String(1), nullable=False, default='1')  # tinytext
+
+
 class Database:
     def __init__(self):
         self.session = None
@@ -61,8 +71,17 @@ class Database:
     def create_new_user(self, tid: int, faculty: int, group: int):
         self.db_reconnect()
         self.session.add(User(tid=tid, faculty=faculty, group=group))
+        self.session.add(Notifications(tid=tid))
         self.session.commit()
 
     def get_place_info(self, place_name) -> Location:
         self.db_reconnect()
         return self.session.query(Location).filter_by(name=place_name).first()
+
+    def get_user_notifications_statuses(self, tid: int) -> Notifications:
+        self.db_reconnect()
+        return self.session.query(Notifications).filter_by(tid=tid).first()
+
+    def update_user_notification_status(self, tid: int, status, value: bool):
+        self.db_reconnect()
+        self.session.query(Notifications).filter_by(tid=tid).update()
