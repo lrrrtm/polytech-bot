@@ -50,7 +50,8 @@ class Database:
         except Exception as e:
             pass
         engine = create_engine(
-            f'mysql+pymysql://{getenv('DB_USER')}:{getenv('DB_PASSWORD')}@{getenv('DB_HOST')}/{getenv('DB_NAME')}')
+            f'mysql+pymysql://{getenv('DB_USER')}:{getenv('DB_PASSWORD')}'
+            f'@{getenv('DB_HOST')}/{getenv('DB_NAME')}')
         Session = sessionmaker(bind=engine)
         self.session = Session()
 
