@@ -45,9 +45,9 @@ class Notifications(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     tid = Column(Integer, ForeignKey('users.id'), nullable=False)
-    schedule_corrections = Column(Integer, nullable=False, default='1')  # tinytext
-    schedule_notify = Column(Integer, nullable=False, default='1')  # tinytext
-    service_msgs = Column(Integer, nullable=False, default='1')  # tinytext
+    schedule_corrections = Column(String(1), nullable=False, default='1')  # tinytext
+    schedule_notify = Column(String(1), nullable=False, default='1')  # tinytext
+    service_msgs = Column(String(1), nullable=False, default='1')  # tinytext
 
 
 class Database:
@@ -83,6 +83,20 @@ class Database:
         self.db_reconnect()
         return self.session.query(Notifications).filter_by(tid=tid).first()
 
-    def update_user_notification_status(self, tid: int, status, value: bool):
+    def update_user_notification_statuses(self, tid: int, schedule_update, lesson_reminder, service_message):
+        data = {
+            'schedule_corrections': schedule_update,
+            'schedule_notify': lesson_reminder,
+            'service_msgs': service_message,
+        }
         self.db_reconnect()
-        self.session.query(Notifications).filter_by(tid=tid).update()
+        self.session.query(Notifications).filter_by(tid=tid).update(data)
+        self.session.commit()
+
+    def edit_user_name(self, tid: int, name: str):
+        data = {
+            'name': name
+        }
+        self.db_reconnect()
+        self.session.query(User).filter_by(tid=tid).update(data)
+        self.session.commit()

@@ -1,4 +1,5 @@
 import os
+import time
 from urllib.parse import urlparse, parse_qs
 
 import flet as ft
@@ -60,6 +61,13 @@ def main(page: ft.Page):
             }
         }
 
+        db.update_user_notification_statuses(
+            page.session.get('tid'),
+            str(int(schedule_update_sw.value)),
+            str(int(lesson_reminder_sw.value)),
+            str(int(service_msg_sw.value)),
+        )
+
         page.snack_bar = ft.SnackBar(
             content=ft.Text(
                 size=16,
@@ -70,20 +78,27 @@ def main(page: ft.Page):
         page.snack_bar.open = True
         page.update()
 
-    def access_to_change_data(e: ft.ControlEvent):
+    def change_name(e: ft.ControlEvent):
+        print(e.control.data)
         type = e.control.data
 
-        e.control.icon = ft.icons.SAVE
-        e.control.tooltip = "Сохранить"
-        e.control.data = f"{e.control.data}_save"
-
-        if type == "name":
+        if type == "edit":
             user_name.read_only = False
+            e.control.data = "save"
+            e.control.icon = ft.icons.SAVE
+            e.control.tooltip = "Сохранить"
             user_name.focus()
-        elif type == "name_save":
+
+        elif type == "save":
             user_name.read_only = True
+            e.control.data = "edit"
             e.control.icon = ft.icons.EDIT
             e.control.tooltip = "Изменить имя"
+
+            db.edit_user_name(
+                page.session.get('tid'),
+                user_name.value.strip(),
+            )
 
             page.snack_bar = ft.SnackBar(
                 content=ft.Text("Имя изменено"),
@@ -92,7 +107,6 @@ def main(page: ft.Page):
             page.snack_bar.open = True
 
         page.update()
-
 
     def show_info_dialog(text: str, show_btn: bool = True):
         page.dialog = ft.AlertDialog(
@@ -138,8 +152,8 @@ def main(page: ft.Page):
                             ft.IconButton(
                                 icon=ft.icons.EDIT,
                                 tooltip="Изменить имя",
-                                data="name",
-                                on_click=access_to_change_data
+                                data="edit",
+                                on_click=change_name
                             )
                         ],
                         width=page.width
@@ -241,13 +255,14 @@ def main(page: ft.Page):
                 'tid': user.tid
             },
             'notifications': {
-                'schedule_update': bool(notifications_data.schedule_corrections),
-                'lesson_reminder': bool(notifications_data.schedule_notify),
-                'service_message': bool(notifications_data.service_msgs)
+                'schedule_update': bool(int(notifications_data.schedule_corrections)),
+                'lesson_reminder': bool(int(notifications_data.schedule_notify)),
+                'service_message': bool(int(notifications_data.service_msgs))
             }
         }
 
         set_user_data(user_data)
+        page.session.set('tid', tid)
         page.add(settings_col)
 
     elif token_status == 'wrong':
