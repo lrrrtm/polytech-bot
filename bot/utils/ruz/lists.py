@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from requests import get
 
 
-# to-do: объединить функции в одну
+# todo: объединить функции в одну
 
 def get_groups_list(search_query: str) -> list:
     """

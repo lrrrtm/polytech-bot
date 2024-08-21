@@ -18,7 +18,7 @@ class Redis:
 
     def set_value(self, key: str, value):
         self.reconnect()
-        self.connection.set(key, value)
+        self.connection.set(key, value, 10)
 
     def get_value(self, key: str):
         self.reconnect()
@@ -26,7 +26,3 @@ class Redis:
 
     # def set_user_settings_token(self, user_id: int, token: str):
     #     self.set_value(str(user_id), token, ttl=30)
-
-
-rd = Redis()
-print(rd.set_value('409801981', 'devmode'))
