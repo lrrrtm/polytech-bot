@@ -5,6 +5,7 @@ from urllib.parse import urlparse, parse_qs
 import flet as ft
 from dotenv import load_dotenv
 
+from bot.utils.ruz.other import get_group_name
 from models.database import Database
 from models.redis_s import Redis
 
@@ -120,6 +121,22 @@ def main(page: ft.Page):
         page.dialog.open = True
         page.update()
 
+    def open_dlg(dialog: ft.AlertDialog):
+        page.dialog = dialog
+        dialog.open = True
+        page.update()
+
+    def close_dlg(dialog: ft.AlertDialog):
+        dialog.open = False
+        page.dialog = None
+        page.update()
+
+    loading_dialog = ft.AlertDialog(
+        modal=True,
+        title=get_card_title("Загрузка"),
+        content=ft.ProgressBar()
+    )
+
     user_name = ft.TextField(
         icon=ft.icons.ACCOUNT_CIRCLE,
         label="Имя",
@@ -224,34 +241,54 @@ def main(page: ft.Page):
         )
     )
 
+    schedule = ft.Card(
+        content=ft.Container(
+            content=ft.Column(
+                controls=[
+                    get_card_title("Расписание"),
+                    ft.ListTile(
+                        leading=ft.Icon(ft.icons.STAR),
+                        title=ft.Text("Избранное"),
+                        subtitle=ft.Text("Нажми, чтобы отредактировать список избранных групп или преподавателей"),
+                        on_click=lambda _: print("123")
+                    )
+                ]
+            ),
+            padding=15
+        )
+    )
+
     settings_col = ft.Column(
         controls=[
             general_info,
-            notifications
+            notifications,
+            schedule
         ]
     )
 
     if bool(os.getenv(('DEVMODE'))):
         page.window.width = 390
         page.window.height = 844
-        tid = 409801981
 
-    page.route = f"/settings?tid={409801981}&token={'devmode'}"
+    # page.route = f"/settings?tid={409801981}&token={'devmode'}"
+    print(page.route)
     parsed_url = urlparse(page.route)
     params = parse_qs(parsed_url.query)
 
-    tid = params.get('tid', [None])[0]
+    tid = params.get('uid', [None])[0]
     token = params.get('token', [None])[0]
 
     token_status = check_access_token(tid, token)
     if token_status == 'exists':
+        open_dlg(loading_dialog)
+        time.sleep(0.5)
         user = db.get_user_by_tid(int(tid))
         notifications_data = db.get_user_notifications_statuses(int(tid))
 
         user_data = {
             'general': {
                 'name': user.name,
-                'group': user.group,
+                'group': get_group_name(user.faculty, user.group),
                 'tid': user.tid
             },
             'notifications': {
@@ -264,6 +301,7 @@ def main(page: ft.Page):
         set_user_data(user_data)
         page.session.set('tid', tid)
         page.add(settings_col)
+        close_dlg(loading_dialog)
 
     elif token_status == 'wrong':
         show_info_dialog(
@@ -282,5 +320,7 @@ def main(page: ft.Page):
 if __name__ == '__main__':
     ft.app(
         target=main,
-        assets_dir='assets'
+        assets_dir='assets',
+        port=8502,
+        view=None
     )
