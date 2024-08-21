@@ -1,20 +1,18 @@
 from aiogram import Router, F
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from bot.keyboards.menu import get_menu_kb, get_back_btn_kb
 from bot.keyboards.schedule import get_schedule_kb
 from bot.lexicon import phrases, buttons
-from bot.states.menu import MenuItem
-from bot.states.teacher_schedule import TeacherSchedule
+
 
 router = Router()
 
 
 @router.message(Command("menu"))
-async def cmd_menu(message: Message, state: FSMContext):
-    await state.set_state(MenuItem.waiting_for_main_menu)
+@router.message(F.text.lower() == buttons.lexicon['menu'])
+async def cmd_menu(message: Message):
     await message.answer(
         text=phrases.lexicon['cmd_menu'],
         reply_markup=get_menu_kb()
