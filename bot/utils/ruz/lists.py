@@ -58,7 +58,3 @@ def get_teachers_list(search_query: str):
 
     return True, result_data
 
-
-# Пример использования
-print(get_groups_list(search_query="5132704"))
-print(get_teachers_list(search_query="Петров"))
