@@ -3,6 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardRemove
 
+from bot.handlers.menu import cmd_menu
 from bot.keyboards.groups import get_buttons_list
 from bot.lexicon import phrases
 from bot.utils.ruz.lists import get_groups_list
@@ -12,6 +13,7 @@ from bot.states.registration import InputGroupNum
 router = Router()
 
 db = Database()
+
 
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
@@ -49,6 +51,7 @@ async def search_group(message: Message, state: FSMContext):
     if groups_list[0] is not None:
         group = groups_list[-1]
         await add_new_user(message, group)
+        await cmd_menu(message)
     else:
         await message.answer("Ошибочка пу пу пу")
 
@@ -56,7 +59,6 @@ async def search_group(message: Message, state: FSMContext):
 async def add_new_user(message: Message, group: dict):
     db.create_new_user(tid=message.from_user.id, faculty=group['faculty'], group=group['groups'])
     await message.answer(
-        text=f"Группа <b>{group['name']}</b> сохранена в твоём профиле. Ты всегда можешь изменить группу, в настройках бота."
-             f"\n\nЧтобы перейти в главное меню, отправь или нажми на /menu",
-        reply_markup=ReplyKeyboardRemove()
+        text=f"Группа <b>{group['name']}</b> сохранена в твоём профиле. "
+             f"Ты всегда можешь изменить группу, в настройках бота."
     )
