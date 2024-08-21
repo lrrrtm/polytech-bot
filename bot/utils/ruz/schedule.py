@@ -20,7 +20,6 @@ def get_week_schedule(type: str, params: dict, date: datetime.date) -> dict:
         url = f"https://ruz.spbstu.ru/faculty/{params['faculty']}/groups/{params['groups']}?date={date.strftime('%Y-%m-%d')}"
     else:
         url = f"https://ruz.spbstu.ru/teachers/{params['teacher_id']}?date={date.strftime('%Y-%m-%d')}"
-    print(url)
     try:
         data = get(url=url, timeout=3)
     except Exception as e:
