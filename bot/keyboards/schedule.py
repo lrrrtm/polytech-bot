@@ -5,12 +5,13 @@ from models.database import Database
 
 db = Database()
 
+
 def get_schedule_kb() -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
 
     builder.row(
         KeyboardButton(text="📆 Сегодня"),
-        KeyboardButton(text="➡️ Завтра"),
+        KeyboardButton(text="🍳 Завтра"),
     )
     builder.row(
         KeyboardButton(text="◀️ Назад"),
