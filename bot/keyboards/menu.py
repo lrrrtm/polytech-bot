@@ -17,8 +17,7 @@ def get_menu_kb() -> ReplyKeyboardMarkup:
         KeyboardButton(text=buttons.lexicon['menu_find_teacher'])
     )
     builder.row(
-        KeyboardButton(text=buttons.lexicon['menu_settings']),
-        KeyboardButton(text=buttons.lexicon['menu_next']),
+        KeyboardButton(text=buttons.lexicon['menu_settings'])
     )
     return builder.as_markup(resize_keyboard=True)
 
