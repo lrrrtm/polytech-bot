@@ -6,7 +6,7 @@ load_dotenv()
 
 def main(page: ft.Page):
     page.title = "Панель администратора"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER,
+    # page.vertical_alignment = ft.MainAxisAlignment.CENTER,
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
     page.theme = ft.Theme(
@@ -18,19 +18,27 @@ def main(page: ft.Page):
 
     page.scroll = None
 
-    col = ft.Column(
-        controls=[
-            ft.Icon(ft.icons.ADMIN_PANEL_SETTINGS, size=200),
-            ft.TextField(hint_text="* * * * * *", text_align=ft.TextAlign.CENTER, width=300, height=50,
-                         password=True, border_radius=ft.border_radius.all(30)),
-            ft.FilledButton(text="Войти", width=300, height=50),
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    card = ft.Card(
+        content=ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Icon(ft.icons.ADMIN_PANEL_SETTINGS, size=200),
+                    ft.TextField(hint_text="* * * * * *", text_align=ft.TextAlign.CENTER, width=300, height=50,
+                                 password=True, border_radius=ft.border_radius.all(30)),
+                    ft.FilledButton(text="Войти", width=300, height=50),
+                    ft.Text("Панель администрирования ботом v0.1")
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            ),
+            padding=15,
+        ),
+        width=450,
+        height=600,
+        elevation=10
     )
 
-    page.add(ft.Container(col, expand=True))
-    page.add(ft.Row([ft.Text("Панель администрирования ботом v0.1")]))
+    page.add(ft.Container(card, expand=True, margin=ft.margin.symmetric(vertical=100)))
 
 
 if __name__ == '__main__':
