@@ -1,4 +1,4 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
@@ -21,34 +21,27 @@ async def cmd_menu(message: Message, state: FSMContext):
     )
 
 
-@router.message(MenuItem.waiting_for_main_menu)
-async def main_menu_item_selected(message: Message, state: FSMContext):
-    await state.clear()
-
-    if message.text == buttons.lexicon['menu_schedule']:
-        await state.set_state(MenuItem.waiting_for_schedule_menu)
-        await message.answer(
-            text=message.text,
-            reply_markup=get_schedule_kb()
-        )
-
-    elif message.text == buttons.lexicon['menu_find_teacher']:
-        await state.set_state(TeacherSchedule.waiting_name_for_find)
-        await message.answer(
-            text="<b>🧑‍🏫 Поиск преподавателя</b>"
-                 "\n\nЗдесь ты можешь определить, где находится преподаватель согласно его расписанию."
-                 "\n\nДля этого отправь фамилию или полное ФИО преподавателя.",
-            reply_markup=get_back_btn_kb()
-        )
+@router.message(F.text == buttons.lexicon['menu_schedule'])
+async def menu_schedule(message: Message):
+    await message.answer(
+        text=message.text,
+        reply_markup=get_schedule_kb()
+    )
 
 
-@router.message(MenuItem.waiting_for_schedule_menu)
-async def main_menu_item_selected(message: Message, state: FSMContext):
-    await state.clear()
+@router.message(F.text == buttons.lexicon['menu_find_teacher'])
+async def menu_find_teacher(message: Message):
+    await message.answer(
+        text="<b>🧑‍🏫 Поиск преподавателя</b>"
+             "\n\nЗдесь ты можешь определить, где находится преподаватель согласно его расписанию."
+             "\n\nДля этого отправь фамилию или полное ФИО преподавателя.",
+        reply_markup=get_back_btn_kb()
+    )
 
-    if message.text == buttons.lexicon['back_btn']:
-        await state.set_state(MenuItem.waiting_for_main_menu)
-        await message.answer(
-            text=message.text,
-            reply_markup=get_menu_kb()
-        )
+
+@router.message(F.text == buttons.lexicon['back_btn'])
+async def back_btn(message: Message):
+    await message.answer(
+        text=message.text,
+        reply_markup=get_menu_kb()
+    )
