@@ -16,17 +16,17 @@ class Redis:
             db=getenv('REDIS_DB'),
         )
 
-    def set_value(self, key: str, value, ttl=-1):
+    def set_value(self, key: str, value):
         self.reconnect()
-        self.connection.set(key, value, ttl)
+        self.connection.set(key, value)
 
     def get_value(self, key: str):
         self.reconnect()
         return self.connection.get(key)
 
-    def set_user_settings_token(self, user_id: int, token: str):
-        self.set_value(str(user_id), token, ttl=30)
+    # def set_user_settings_token(self, user_id: int, token: str):
+    #     self.set_value(str(user_id), token, ttl=30)
 
 
 rd = Redis()
-print(rd.get_value('409801981'))
+print(rd.set_value('409801981', 'devmode'))

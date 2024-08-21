@@ -45,9 +45,9 @@ class Notifications(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     tid = Column(Integer, ForeignKey('users.id'), nullable=False)
-    schedule_corrections = Column(String(1), nullable=False, default='1')  # tinytext
-    schedule_notify = Column(String(1), nullable=False, default='1')  # tinytext
-    service_msgs = Column(String(1), nullable=False, default='1')  # tinytext
+    schedule_corrections = Column(Integer, nullable=False, default='1')  # tinytext
+    schedule_notify = Column(Integer, nullable=False, default='1')  # tinytext
+    service_msgs = Column(Integer, nullable=False, default='1')  # tinytext
 
 
 class Database:
