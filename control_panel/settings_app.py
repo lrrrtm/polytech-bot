@@ -16,10 +16,6 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.MainAxisAlignment.CENTER
 
     page.theme = ft.Theme(
-        # color_scheme=ft.ColorScheme(
-        #     primary="#38b349",
-        #     primary_container=ft.colors.GREEN_200
-        # ),
     )
 
     notification_changed_snack_bar = ft.SnackBar(
