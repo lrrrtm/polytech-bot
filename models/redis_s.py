@@ -23,6 +23,3 @@ class Redis:
     def get_value(self, key: str):
         self.reconnect()
         return self.connection.get(key)
-
-    # def set_user_settings_token(self, user_id: int, token: str):
-    #     self.set_value(str(user_id), token, ttl=30)
