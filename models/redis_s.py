@@ -18,7 +18,7 @@ class Redis:
 
     def set_value(self, key: str, value):
         self.reconnect()
-        self.connection.set(key, value, 10)
+        self.connection.set(key, value, 30)
 
     def get_value(self, key: str):
         self.reconnect()

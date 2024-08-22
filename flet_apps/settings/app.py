@@ -246,7 +246,6 @@ def main(page: ft.Page):
         ]
     )
 
-    print(page.route)
     if bool(int(os.getenv(('DEVMODE')))):
         page.window.width = 390
         page.window.height = 844

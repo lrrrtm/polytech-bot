@@ -11,6 +11,9 @@ def get_groups_list(search_query: str) -> list:
     :return:
     :result_data: список найденных групп
     """
+    if len(search_query) > 20:
+        return [None]
+
     try:
         data = get(url=f"https://ruz.spbstu.ru/search/groups?q={search_query}", timeout=10)
     except Exception as e:
@@ -57,4 +60,3 @@ def get_teachers_list(search_query: str):
         )
 
     return True, result_data
-
