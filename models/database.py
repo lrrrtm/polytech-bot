@@ -100,3 +100,12 @@ class Database:
         self.db_reconnect()
         self.session.query(User).filter_by(tid=tid).update(data)
         self.session.commit()
+
+    def edit_user_group(self, tid: int, faculty: int, group: int):
+        data = {
+            'faculty': faculty,
+            'group': group
+        }
+        self.db_reconnect()
+        self.session.query(User).filter_by(tid=tid).update(data)
+        self.session.commit()
