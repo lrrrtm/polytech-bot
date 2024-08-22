@@ -38,7 +38,6 @@ async def search_group(message: Message, state: FSMContext):
                 text="Нашлось несколько групп, выбери свою из списка",
                 reply_markup=get_buttons_list(groups_list)
             )
-
     else:
         await state.clear()
         await message.answer("Ошибочка пу пу пу")
@@ -57,6 +56,8 @@ async def search_group(message: Message, state: FSMContext):
 
 
 async def add_new_user(message: Message, group: dict):
+    # todo: вынести в models/requests.py (впрочем, туда вынести все запросы к базе данных,
+    #  тут в логике должны быть только хендлеры)
     db.create_new_user(tid=message.from_user.id, faculty=group['faculty'], group=group['groups'])
     await message.answer(
         text=f"Группа <b>{group['name']}</b> сохранена в твоём профиле. "

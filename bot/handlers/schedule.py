@@ -17,3 +17,16 @@ async def back_btn(message: Message, state: FSMContext):
         text="Поиск расписания отменён.",
     )
     await cmd_menu(message, state)
+
+
+# todo: Логика такая: по умолчанию будет открывать сегодняшнее расписание,
+#  и при этом выводится с инлайн кнопками каждого дня следующих 2 недель.
+#  При
+@router.message(Command("schedule"))
+@router.message(F.text == buttons.lexicon['menu_schedule'])
+async def menu_schedule(message: Message, state: FSMContext):
+    await state.set_state(MenuItem.waiting_for_schedule_menu)
+    await message.answer(
+        text=message.text,
+        reply_markup=get_schedule_kb()
+    )
