@@ -9,6 +9,7 @@ router = Router()
 
 
 @router.message()
+@router.message(Command("help"))
 async def cmd_help(message: Message):
     """Команда /help, но также и мусорка для необработанных событий."""
     await message.answer(
