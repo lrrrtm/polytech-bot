@@ -16,9 +16,9 @@ class Redis:
             db=getenv('REDIS_DB'),
         )
 
-    def set_value(self, key: str, value, ttl=-1):
+    def set_value(self, key: str, value):
         self.reconnect()
-        self.connection.set(key, value, ttl)
+        self.connection.set(key, value, 30)
 
     def get_value(self, key: str):
         self.reconnect()

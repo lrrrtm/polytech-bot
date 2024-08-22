@@ -9,8 +9,10 @@ from bot.lexicon import phrases, buttons
 from bot.states.teacher_schedule import TeacherSchedule
 from bot.states.menu import MenuItem
 from bot.utils.aceess_tokens import get_aceess_token_for_settings
+from models.redis_s import Redis
 
 router = Router()
+rd = Redis()
 
 
 @router.message(Command("menu"))
@@ -57,21 +59,13 @@ async def menu_find_teacher(message: Message, state: FSMContext):
 @router.message(Command("settings"))
 @router.message(F.text == buttons.lexicon['menu_settings'])
 async def menu_settings(message: Message):
+    token = get_aceess_token_for_settings(message.from_user.id)
+    rd.set_value(str(message.from_user.id), token)
     await message.answer(
-        text=message.text,
+        text=phrases.lexicon['cmd_settings'],
         reply_markup=get_settings_btn_kb(
             user_id=message.from_user.id,
-            access_token=get_aceess_token_for_settings(message.from_user.id)
+            access_token=token
         )
     )
 
-
-@router.message(F.text == buttons.lexicon['menu_next'])
-async def menu_next(message: Message):
-    # todo: тут, я так понимаю, должна быть вторая страница меню, но зачем так переносить, если можно всё сделать
-    #  на одной с обычным пролистыванием. Считаю, что это лучше чем нагромождение лишними кнопками и действиями.
-    #  Поэтому этот хэндлер я бы удалил
-    await message.answer(
-        text=message.text,
-        reply_markup=get_menu_kb()
-    )
