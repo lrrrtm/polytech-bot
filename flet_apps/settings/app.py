@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from bot.utils.ruz.lists import get_groups_list
 from bot.utils.ruz.other import get_group_name
+from flet_apps.settings.dialogs import InfoDialog
 from models.database import Database
 from models.redis_s import Redis
 
@@ -21,6 +22,8 @@ def main(page: ft.Page):
 
     db = Database()
     rd = Redis()
+
+    info = InfoDialog(page)
 
     def get_card_title(text: str) -> ft.Text:
         return ft.Text(
@@ -72,27 +75,25 @@ def main(page: ft.Page):
         elif action == 'save_group':
             new_group_name = user_group.value.strip()
 
-            open_dlg(loading_dialog)
-
             groups_list = get_groups_list(search_query=new_group_name)
 
-            if groups_list[0] is not None and len(groups_list) == 1:
-                # todo: обновляем группу
-                pass
+            if len(groups_list) == 0:
+                info.open("Редактирование", f"Группа {new_group_name} не найдена, попробуй ещё раз.")
+            elif groups_list[0] is not None and len(groups_list) == 1:
+                db.edit_user_group(page.session.get('tid'), int(groups_list[0]['faculty']),
+                                   int(groups_list[0]['groups']))
+                e.control.icon = ft.icons.EDIT
+                e.control.tooltip = "Изменить группу"
+                e.control.data['action'] = "edit_group"
+                user_group.read_only = True
+                info.open("Редактирование", f"Твоя группа изменена на {new_group_name}.")
+
             elif groups_list[0] is not None and len(groups_list) > 1:
-                # todo: есть несколько групп, просим уточнить
-                pass
+                info.open("Редактирование",
+                          f"Найдено несколько групп, в которых есть часть {new_group_name}, введи точный номер своей группы.")
+
             elif groups_list[0] is None:
-                # todo: ошибка связи с рузом
-                pass
-            # todo: если проверка прошла -> обновление бд -> уведомление на экран, иначе -> уведомление на экран
-
-            close_dlg(loading_dialog)
-            e.control.icon = ft.icons.EDIT
-            e.control.tooltip = "Изменить группу"
-            e.control.data['action'] = "edit_group"
-
-            user_group.read_only = True
+                info.open("Ошибка", f"Ошибка связи с сервером, попробуй ещё раз.")
 
         page.update()
 
@@ -227,8 +228,9 @@ def main(page: ft.Page):
                     ft.ListTile(
                         leading=ft.Icon(ft.icons.STAR),
                         title=ft.Text("Избранное"),
-                        subtitle=ft.Text("Редактирование списка избранных групп и преподавателей"),
-                        on_click=lambda _: print("123")
+                        subtitle=ft.Text("Временно недоступно"),
+                        on_click=lambda _: print("123"),
+                        disabled=True
                     )
                 ]
             ),
@@ -244,7 +246,8 @@ def main(page: ft.Page):
         ]
     )
 
-    if bool(os.getenv(('DEVMODE'))):
+    print(page.route)
+    if bool(int(os.getenv(('DEVMODE')))):
         page.window.width = 390
         page.window.height = 844
         page.route = f"/settings?tid={409801981}&token={'devmode'}"
@@ -261,11 +264,8 @@ def main(page: ft.Page):
     token_status = check_access_token(tid, token)
     if token_status == 'exists':
         open_dlg(loading_dialog)
-        print('ok1')
         user = db.get_user_by_tid(int(tid))
-        print('ok2')
         notifications_data = db.get_user_notifications_statuses(int(tid))
-        print('ok3')
 
         user_data = {
             'general': {
@@ -286,14 +286,13 @@ def main(page: ft.Page):
 
     elif token_status == 'wrong':
         show_info_dialog(
-            text="У вас отсутствует разрешение на просмотр настроек данного пользователя"
+            text="Изменение настроек доступно только внутри бота."
         )
 
     elif token_status == 'empty':
         show_info_dialog(
-            text="Срок токена соединения истёк, нажми на кнопку «Настройки» в боте ещё раз."
+            text="Эта кнопка больше не работает, нажми на «Настройки» в боте ещё раз."
         )
-        print('TOKEN STATUS EMPTY')
 
     page.update()
 
@@ -302,6 +301,6 @@ if __name__ == '__main__':
     ft.app(
         target=main,
         assets_dir='assets',
-        # port=8502,
-        # view=None
+        port=8502,
+        view=None
     )
