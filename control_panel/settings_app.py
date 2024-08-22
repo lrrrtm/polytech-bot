@@ -5,6 +5,7 @@ from urllib.parse import urlparse, parse_qs
 import flet as ft
 from dotenv import load_dotenv
 
+from bot.utils.ruz.lists import get_groups_list
 from bot.utils.ruz.other import get_group_name
 from models.database import Database
 from models.redis_s import Redis
@@ -29,7 +30,6 @@ def main(page: ft.Page):
         )
 
     def set_user_data(user_data: dict):
-        user_name.value = user_data['general']['name']
         user_group.value = user_data['general']['group']
         user_tid.value = user_data['general']['tid']
 
@@ -51,16 +51,6 @@ def main(page: ft.Page):
         return status
 
     def notification_switch_changed(e: ft.ControlEvent):
-        switch_statuses = {
-            True: {
-                'caption': "Уведомление подключено",
-                'bgcolor': ft.colors.GREEN
-            },
-            False: {
-                'caption': "Уведомление отключено",
-                'bgcolor': ft.colors.AMBER
-            }
-        }
 
         db.update_user_notification_statuses(
             page.session.get('tid'),
@@ -69,43 +59,40 @@ def main(page: ft.Page):
             str(int(service_msg_sw.value)),
         )
 
-        page.snack_bar = ft.SnackBar(
-            content=ft.Text(
-                size=16,
-                value=switch_statuses[e.control.value]['caption'],
-            ),
-            bgcolor=switch_statuses[e.control.value]['bgcolor']
-        )
-        page.snack_bar.open = True
-        page.update()
+    def group_redactor(e: ft.ControlEvent):
+        action = e.control.data['action']
 
-    def change_name(e: ft.ControlEvent):
-        print(e.control.data)
-        type = e.control.data
-
-        if type == "edit":
-            user_name.read_only = False
-            e.control.data = "save"
+        if action == 'edit_group':
             e.control.icon = ft.icons.SAVE
             e.control.tooltip = "Сохранить"
-            user_name.focus()
+            e.control.data['action'] = "save_group"
+            user_group.read_only = False
+            user_group.focus()
 
-        elif type == "save":
-            user_name.read_only = True
-            e.control.data = "edit"
+        elif action == 'save_group':
+            new_group_name = user_group.value.strip()
+
+            open_dlg(loading_dialog)
+
+            groups_list = get_groups_list(search_query=new_group_name)
+
+            if groups_list[0] is not None and len(groups_list) == 1:
+                # todo: обновляем группу
+                pass
+            elif groups_list[0] is not None and len(groups_list) > 1:
+                # todo: есть несколько групп, просим уточнить
+                pass
+            elif groups_list[0] is None:
+                # todo: ошибка связи с рузом
+                pass
+            # todo: если проверка прошла -> обновление бд -> уведомление на экран, иначе -> уведомление на экран
+
+            close_dlg(loading_dialog)
             e.control.icon = ft.icons.EDIT
-            e.control.tooltip = "Изменить имя"
+            e.control.tooltip = "Изменить группу"
+            e.control.data['action'] = "edit_group"
 
-            db.edit_user_name(
-                page.session.get('tid'),
-                user_name.value.strip(),
-            )
-
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text("Имя изменено"),
-                bgcolor=ft.colors.GREEN
-            )
-            page.snack_bar.open = True
+            user_group.read_only = True
 
         page.update()
 
@@ -116,7 +103,10 @@ def main(page: ft.Page):
             content=ft.Text(
                 value=text,
                 size=16
-            )
+            ),
+            actions=[
+                ft.TextButton("OK", on_click=lambda _: close_dlg(loading_dialog), visible=show_btn),
+            ]
         )
         page.dialog.open = True
         page.update()
@@ -135,12 +125,6 @@ def main(page: ft.Page):
         modal=True,
         title=get_card_title("Загрузка"),
         content=ft.ProgressBar()
-    )
-
-    user_name = ft.TextField(
-        icon=ft.icons.ACCOUNT_CIRCLE,
-        label="Имя",
-        read_only=True
     )
 
     user_group = ft.TextField(
@@ -163,28 +147,14 @@ def main(page: ft.Page):
                     ft.Row(
                         controls=[
                             ft.Container(
-                                content=user_name,
-                                expand=True
-                            ),
-                            ft.IconButton(
-                                icon=ft.icons.EDIT,
-                                tooltip="Изменить имя",
-                                data="edit",
-                                on_click=change_name
-                            )
-                        ],
-                        width=page.width
-                    ),
-                    ft.Row(
-                        controls=[
-                            ft.Container(
                                 content=user_group,
                                 expand=True
                             ),
                             ft.IconButton(
                                 icon=ft.icons.EDIT,
+                                data={'action': "edit_group"},
                                 tooltip="Изменить группу",
-                                on_click=None
+                                on_click=group_redactor
                             )
                         ],
                         width=page.width
@@ -229,6 +199,14 @@ def main(page: ft.Page):
                                     title=ft.Text("Технические сообщения"),
                                     subtitle=ft.Text(
                                         "Расскажем о новом функционале и предупредим о временном отключении бота")
+                                ),
+                                ft.ListTile(
+                                    leading=ft.Switch(),
+                                    title=ft.Text("Наличие пышек"),
+                                    subtitle=ft.Text(
+                                        "Временно недоступно"
+                                    ),
+                                    disabled=True
                                 )
                             ]
                         ),
@@ -249,7 +227,7 @@ def main(page: ft.Page):
                     ft.ListTile(
                         leading=ft.Icon(ft.icons.STAR),
                         title=ft.Text("Избранное"),
-                        subtitle=ft.Text("Нажми, чтобы отредактировать список избранных групп или преподавателей"),
+                        subtitle=ft.Text("Редактирование списка избранных групп и преподавателей"),
                         on_click=lambda _: print("123")
                     )
                 ]
@@ -269,25 +247,28 @@ def main(page: ft.Page):
     if bool(os.getenv(('DEVMODE'))):
         page.window.width = 390
         page.window.height = 844
+        page.route = f"/settings?tid={409801981}&token={'devmode'}"
+        tid = '409801981'
+        token = 'devmode'
 
-    # page.route = f"/settings?tid={409801981}&token={'devmode'}"
-    print(page.route)
-    parsed_url = urlparse(page.route)
-    params = parse_qs(parsed_url.query)
+    else:
+        parsed_url = urlparse(page.route)
+        params = parse_qs(parsed_url.query)
 
-    tid = params.get('uid', [None])[0]
-    token = params.get('token', [None])[0]
+        tid = params.get('uid', [None])[0]
+        token = params.get('token', [None])[0]
 
     token_status = check_access_token(tid, token)
     if token_status == 'exists':
         open_dlg(loading_dialog)
-        time.sleep(0.5)
+        print('ok1')
         user = db.get_user_by_tid(int(tid))
+        print('ok2')
         notifications_data = db.get_user_notifications_statuses(int(tid))
+        print('ok3')
 
         user_data = {
             'general': {
-                'name': user.name,
                 'group': get_group_name(user.faculty, user.group),
                 'tid': user.tid
             },
@@ -321,6 +302,6 @@ if __name__ == '__main__':
     ft.app(
         target=main,
         assets_dir='assets',
-        port=8502,
-        view=None
+        # port=8502,
+        # view=None
     )
