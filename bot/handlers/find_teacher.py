@@ -17,9 +17,6 @@ router = Router()
 
 @router.message(TeacherSchedule.waiting_name_for_find, F.text == buttons.lexicon['back_btn'])
 async def back_btn(message: Message, state: FSMContext):
-    await message.answer(
-        text="Поиск преподавателя отменён.",
-    )
     await cmd_menu(message, state)
 
 
@@ -48,11 +45,16 @@ async def teacher_name_recieved(message: Message, state: FSMContext):
                 )
                 await cmd_menu(message, state)
 
-        else:  # больше 1 варианта, просим уточнить
-            await message.answer(
-                text="Нашлось несколько преподавателей, выбери нужного из списка:",
-                reply_markup=get_buttons_list(teachers_list)
-            )
+        else:
+            if len(teachers_list) > 50:
+                await message.answer(
+                    text="Нашлось слишком много совпадений по твоему запросу, напиши более полное ФИО преподавателя"
+                )
+            else:
+                await message.answer(
+                    text="Нашлось несколько преподавателей, выбери нужного из списка:",
+                    reply_markup=get_buttons_list(teachers_list)
+                )
     else:
         await message.answer(
             text="При получении данных возникла ошибка, попробуй ещё раз."

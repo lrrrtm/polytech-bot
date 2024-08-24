@@ -1,9 +1,9 @@
-import json
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
+
+# todo: помечать преподов с идентичными ФИО, добавляя в конец их имени id
 
 def parse_teachers_list():
     options = Options()
