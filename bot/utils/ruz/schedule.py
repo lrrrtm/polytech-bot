@@ -75,8 +75,8 @@ def get_week_schedule(type: str, params: dict, date: datetime.date) -> dict:
 
 
 def get_teacher_location(teacher_id: int):
-    # current_date = datetime.datetime.now().date()
-    current_date = datetime.datetime(year=2024, month=9, day=2, hour=9, minute=0)
+    current_date = datetime.datetime.now()
+    # current_date = datetime.datetime(year=2024, month=9, day=2, hour=9, minute=0)
     schedule = get_week_schedule(
         type="teacher",
         params={'teacher_id': teacher_id},

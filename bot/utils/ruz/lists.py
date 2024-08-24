@@ -39,21 +39,18 @@ def get_teachers_list(search_query: str):
         :return:
         :result_data: список найденных преподавателей
         """
-    try:
-        data = get(url=f"https://ruz.spbstu.ru/search/teacher?q={search_query}", timeout=3)
-    except Exception as e:
-        return False, []
-
-    soup = BeautifulSoup(data.text, "html.parser")
-    teachers_list = soup.find_all("a", {"class": "search-result__link"})
+    with open("D:\Projects\polytech_bot\parsed_data\\teachers.json", encoding="utf-8") as file:
+        teachers_list = json.load(file)
+        teachers_list = teachers_list['data']
 
     result_data = []
     for teacher in teachers_list:
-        result_data.append(
-            {
-                'name': teacher.text,
-                'id': teacher.attrs["href"].split("/")[-1],
-            }
-        )
+        if search_query in teacher['name']:
+            result_data.append(
+                {
+                    'name': teacher['name'],
+                    'id': teacher['id'],
+                }
+            )
 
     return True, result_data
