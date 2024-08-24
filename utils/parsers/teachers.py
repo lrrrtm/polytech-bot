@@ -34,9 +34,6 @@ def parse_teachers_list():
                 break
         return data
 
-    except Exception as e:
-        return None
-
     finally:
         driver.close()
         driver.quit()
