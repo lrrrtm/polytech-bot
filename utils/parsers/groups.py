@@ -11,14 +11,12 @@ def parse_groups_list():
     try:
         data = get(url=url, timeout=10)
     except Exception as e:
-        print(e)
         return None
 
     soup = BeautifulSoup(data.text, "html.parser")
     groups = soup.find_all("a", {"class": "groups-list__link"})
 
     for group in groups:
-        print(group.text)
         group_data = {
             'name': group.text,
             'faculty': group.attrs["href"].split("/")[-3],
