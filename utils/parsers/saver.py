@@ -1,11 +1,12 @@
 import json
 from datetime import datetime
+from os import getenv
 
 
 def save_parsed_data(data: list, data_type: str):
     paths = {
-        'groups': "D:\Projects\polytech_bot\parsed_data\groups.json",
-        'teachers': "D:\Projects\polytech_bot\parsed_data\\teachers.json"
+        'groups': fr"{getenv('ABSOLUTE_PROJECT_FOLDER')}\parsed_data\groups.json",
+        'teachers': fr"{getenv('ABSOLUTE_PROJECT_FOLDER')}\parsed_data\teachers.json"
     }
 
     with open(paths[data_type], 'w') as file:

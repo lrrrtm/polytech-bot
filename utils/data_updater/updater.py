@@ -37,7 +37,8 @@ schedule.every().day.at(update_time).do(teachers_list_updater)
 
 if bool(int(getenv(('DEVMODE')))):
     print(schedule.get_jobs())
-    teachers_list_updater()
+    groups_list_updater()
+    # teachers_list_updater()
 
 while True:
     schedule.run_pending()
