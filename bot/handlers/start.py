@@ -26,8 +26,9 @@ async def cmd_start(message: Message, state: FSMContext):
 
 @router.message(InputGroupNum.waiting_for_msg)
 async def search_group(message: Message, state: FSMContext):
+
     groups_list = get_groups_list(message.text)
-    if groups_list[0] is not None:
+    if groups_list:
         if len(groups_list) == 1:
             await state.clear()
             group = groups_list[-1]
@@ -35,13 +36,14 @@ async def search_group(message: Message, state: FSMContext):
         else:
             await state.set_state(InputGroupNum.waiting_for_select)
             await message.answer(
-                text="Нашлось несколько групп, выбери свою из списка",
+                text="Нашлось несколько групп, выбери свою из списка:",
                 reply_markup=get_buttons_list(groups_list)
             )
-
     else:
-        await state.clear()
-        await message.answer("Ошибочка пу пу пу")
+        await message.answer(
+            text="Такой группы не существует, попробуй ещё раз.",
+            reply_markup=get_buttons_list(groups_list)
+        )
 
 
 @router.message(InputGroupNum.waiting_for_select)
@@ -51,7 +53,7 @@ async def search_group(message: Message, state: FSMContext):
     if groups_list[0] is not None:
         group = groups_list[-1]
         await add_new_user(message, group)
-        await cmd_menu(message)
+        await cmd_menu(message, state)
     else:
         await message.answer("Ошибочка пу пу пу")
 

@@ -1,3 +1,5 @@
+import json
+
 from bs4 import BeautifulSoup
 from requests import get
 
@@ -11,26 +13,21 @@ def get_groups_list(search_query: str) -> list:
     :return:
     :result_data: список найденных групп
     """
-    if len(search_query) > 20:
-        return [None]
 
-    try:
-        data = get(url=f"https://ruz.spbstu.ru/search/groups?q={search_query}", timeout=10)
-    except Exception as e:
-        return [None]
-
-    soup = BeautifulSoup(data.text, "html.parser")
-    groups_list = soup.find_all("a", {"class": "groups-list__link"})
+    with open("D:\Projects\polytech_bot\parsed_data\groups.json", encoding="utf-8") as file:
+        groups_list = json.load(file)
+        groups_list = groups_list['data']
 
     result_data = []
     for group in groups_list:
-        result_data.append(
-            {
-                'name': group.text,
-                'faculty': group.attrs["href"].split("/")[-3],
-                'groups': group.attrs["href"].split("/")[-1],
-            }
-        )
+        if search_query in group['name']:
+            result_data.append(
+                {
+                    'name': group['name'],
+                    'faculty': group['faculty'],
+                    'groups': group['group'],
+                }
+            )
 
     return result_data
 
