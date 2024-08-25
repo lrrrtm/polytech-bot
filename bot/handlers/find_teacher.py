@@ -22,41 +22,35 @@ async def back_btn(message: Message, state: FSMContext):
 
 @router.message(TeacherSchedule.waiting_name_for_find)
 async def teacher_name_recieved(message: Message, state: FSMContext):
-    response, teachers_list = get_teachers_list(message.text)
+    teachers_list = get_teachers_list(message.text)
 
-    if response:  # всё ок
-        if len(teachers_list) == 0:  # никого не нашлось
-            await message.answer(
-                text="По твоему запросу не нашлось ни одного преподавателя, попробуй ещё раз.",
-                reply_markup=get_back_btn_kb()
-            )
-        elif len(teachers_list) == 1:  # одно совпадение, сразу дальше
-            response, location_data = get_teacher_location(teachers_list[-1]['id'])
-            if response:
-                text_to_send = get_block_for_location(location_data)
-                await message.answer(
-                    text=text_to_send,
-                    reply_markup=get_inline_location_kb(location_data['url'], location_data['lesson'])
-                )
-                await cmd_menu(message, state)
-            else:
-                await message.answer(
-                    text="При получении данных возникла ошибка, попробуй ещё раз."
-                )
-                await cmd_menu(message, state)
-
-        else:
-            if len(teachers_list) > 50:
-                await message.answer(
-                    text="Нашлось слишком много совпадений по твоему запросу, напиши более полное ФИО преподавателя"
-                )
-            else:
-                await message.answer(
-                    text="Нашлось несколько преподавателей, выбери нужного из списка:",
-                    reply_markup=get_buttons_list(teachers_list)
-                )
-    else:
+    if len(teachers_list) == 0:
         await message.answer(
-            text="При получении данных возникла ошибка, попробуй ещё раз."
+            text="По твоему запросу не нашлось ни одного преподавателя, попробуй ещё раз.",
+            reply_markup=get_back_btn_kb()
         )
-        await cmd_menu(message, state)
+    elif len(teachers_list) == 1:
+        response, location_data = get_teacher_location(teachers_list[-1]['id'])
+        if response:
+            text_to_send = get_block_for_location(location_data)
+            await message.answer(
+                text=text_to_send,
+                reply_markup=get_inline_location_kb(location_data['url'], location_data['lesson'])
+            )
+            await cmd_menu(message, state)
+        else:
+            await message.answer(
+                text="При получении данных возникла ошибка, попробуй ещё раз."
+            )
+            await cmd_menu(message, state)
+
+    else:
+        if len(teachers_list) > 50:
+            await message.answer(
+                text="Нашлось слишком много совпадений по твоему запросу, напиши более полное ФИО преподавателя"
+            )
+        else:
+            await message.answer(
+                text="Нашлось несколько преподавателей, выбери нужного из списка:",
+                reply_markup=get_buttons_list(teachers_list)
+            )

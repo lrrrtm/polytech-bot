@@ -3,13 +3,6 @@ from os import getenv
 
 
 def get_groups_list(search_query: str) -> list:
-    """
-    Поиск групп по значению search_query
-    :param search_query: строка поиска
-    :return:
-    :result_data: список найденных групп
-    """
-
     with open(f"{getenv('ABSOLUTE_PROJECT_FOLDER')}\parsed_data\groups.json", encoding="utf-8") as file:
         groups_list = json.load(file)
         groups_list = groups_list['data']
@@ -29,24 +22,18 @@ def get_groups_list(search_query: str) -> list:
 
 
 def get_teachers_list(search_query: str):
-    """
-        Поиск преподавателей по значению search_query
-        :param search_query: строка поиска
-        :return:
-        :result_data: список найденных преподавателей
-        """
     with open(f"{getenv('ABSOLUTE_PROJECT_FOLDER')}\parsed_data\\teachers.json", encoding="utf-8") as file:
         teachers_list = json.load(file)
         teachers_list = teachers_list['data']
 
-    result_data = []
-    for teacher in teachers_list:
-        if search_query in teacher['name']:
-            result_data.append(
-                {
-                    'name': teacher['name'],
-                    'id': teacher['id'],
-                }
-            )
+    search_query = search_query.lower()
+    query_parts = search_query.split()
 
-    return True, result_data
+    matches = []
+
+    for teacher in teachers_list:
+        name = teacher['name'].lower()
+        if all(part in name for part in query_parts):
+            matches.append(teacher)
+
+    return True, matches
