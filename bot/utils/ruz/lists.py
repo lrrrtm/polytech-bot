@@ -2,6 +2,8 @@ import json
 from os import getenv
 
 
+# todo: объединить функции в одну
+
 def get_groups_list(search_query: str) -> list:
     with open(f"{getenv('ABSOLUTE_PROJECT_FOLDER')}\parsed_data\groups.json", encoding="utf-8") as file:
         groups_list = json.load(file)

@@ -58,6 +58,8 @@ async def waiting_for_select(message: Message, state: FSMContext):
 
 
 async def add_new_user(message: Message, group: dict):
+    # todo: вынести в models/requests.py (впрочем, туда вынести все запросы к базе данных,
+    #  тут в логике должны быть только хендлеры)
     db.create_new_user(tid=message.from_user.id, faculty=group['faculty'], group=group['groups'])
     await message.answer(
         text=f"Группа <b>{group['name']}</b> сохранена в твоём профиле. "

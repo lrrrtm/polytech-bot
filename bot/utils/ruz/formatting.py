@@ -22,7 +22,8 @@ def get_block_for_location(location_data) -> str:
     if location_data['status'] != 'empty':
         lesson = location_data['lesson']
         text_block += (f"\n\n<b>{lesson['name']}</b>"
-                       f"\n⏰ {datetime.strftime(lesson['time']['start'], '%H:%M')}-{datetime.strftime(lesson['time']['end'], '%H:%M')}"
+                       f"\n⏰ {datetime.strftime(lesson['time']['start'], '%H:%M')}-"
+                       f"{datetime.strftime(lesson['time']['end'], '%H:%M')}"
                        f"\n📚 {lesson['type']}"
                        f"\n📍 {lesson['places']}")
 
