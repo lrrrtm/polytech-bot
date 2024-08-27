@@ -35,16 +35,6 @@ async def menu_schedule(message: Message, state: FSMContext):
     )
 
 
-@router.message(Command("buildings"))
-@router.message(F.text == buttons.lexicon['menu_buildings'])
-async def menu_buildings(message: Message, state: FSMContext):
-    await state.set_state(MenuItem.waiting_for_buildings)
-    await message.answer(
-        text=message.text,
-        reply_markup=get_menu_kb()
-    )
-
-
 @router.message(Command("find_teacher"))
 @router.message(F.text == buttons.lexicon['menu_find_teacher'])
 async def menu_find_teacher(message: Message, state: FSMContext):
