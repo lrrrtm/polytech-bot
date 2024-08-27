@@ -13,6 +13,7 @@ update_time = f"0{getenv('UPDATER_HOUR', 1)}:00"
 
 
 def groups_list_updater():
+    print('groups_list_updater started...')
     data = parse_groups_list()
     if data is not None:
         save_parsed_data(
@@ -22,6 +23,7 @@ def groups_list_updater():
 
 
 def teachers_list_updater():
+    print('teachers_list_updater started...')
     data = parse_teachers_list()
     if data is not None:
         save_parsed_data(
@@ -33,7 +35,11 @@ def teachers_list_updater():
 schedule.every().day.at(update_time).do(groups_list_updater)
 schedule.every().day.at(update_time).do(teachers_list_updater)
 
-print(schedule.get_jobs())
+if bool(int(getenv(('DEVMODE')))):
+    print(schedule.get_jobs())
+    groups_list_updater()
+    # teachers_list_updater()
+
 while True:
     schedule.run_pending()
     time.sleep(1)

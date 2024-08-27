@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Redis:
     def __init__(self):
         self.connection = None
