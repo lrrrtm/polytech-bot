@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from handlers import (start, menu, schedule, buildings, find_teacher, help, about)
+
+from handlers import (start, menu, schedule, buildings, find_teacher, help, about, admin_commands)
 
 load_dotenv()
 
@@ -18,4 +19,5 @@ dp.include_routers(
     find_teacher.router,
     about.router,
     help.router,
+    admin_commands.router
 )

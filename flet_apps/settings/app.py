@@ -247,6 +247,7 @@ def main(page: ft.Page):
     )
 
     if bool(int(os.getenv(('DEVMODE')))):
+        rd.set_value('409801981', 'devmode')
         page.window.width = 390
         page.window.height = 844
         page.route = f"/settings?tid={409801981}&token={'devmode'}"
@@ -297,9 +298,10 @@ def main(page: ft.Page):
 
 
 if __name__ == '__main__':
+
     ft.app(
         target=main,
         assets_dir='assets',
-        port=8502,
-        view=None
+        # port=8502,
+        # view=None
     )

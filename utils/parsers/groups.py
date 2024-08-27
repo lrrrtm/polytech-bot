@@ -1,4 +1,3 @@
-# todo: тут будет функция для парсинга списка групп
 from bs4 import BeautifulSoup
 from requests import get
 
