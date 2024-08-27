@@ -79,6 +79,14 @@ class Database:
         self.db_reconnect()
         return self.session.query(Location).filter_by(name=place_name).first()
 
+    def get_all_places_names(self) -> list[str]:
+        self.db_reconnect()
+        return [location.name for location in self.session.query(Location.name).all()]
+
+    def get_building_map_id(self, place_name) -> str:
+        self.db_reconnect()
+        return self.session.query(Location.yandex_maps_id).filter_by(name=place_name).first()
+
     def get_user_notifications_statuses(self, tid: int) -> Notifications:
         self.db_reconnect()
         return self.session.query(Notifications).filter_by(tid=tid).first()

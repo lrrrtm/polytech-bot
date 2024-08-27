@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from bot.keyboards.menu import get_menu_kb, get_back_btn_kb, get_settings_btn_kb
+from bot.keyboards.menu import (get_menu_kb, get_back_btn_kb, get_settings_btn_kb)
 from bot.keyboards.schedule import get_schedule_kb
 from bot.lexicon import phrases, buttons
 from bot.states.teacher_schedule import TeacherSchedule
@@ -32,17 +32,6 @@ async def menu_schedule(message: Message, state: FSMContext):
     await message.answer(
         text=message.text,
         reply_markup=get_schedule_kb()
-    )
-
-
-@router.message(Command("buildings"))
-@router.message(F.text == buttons.lexicon['menu_buildings'])
-async def menu_buildings(message: Message):
-    # todo: чёто с картой. Скорее всего схема прохода скрином или просто ссылка на яндекс карты
-    #  с маршрутом от текущего местоположения
-    await message.answer(
-        text=message.text,
-        reply_markup=get_menu_kb()
     )
 
 

@@ -3,14 +3,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from bot.handlers.menu import cmd_menu
-from bot.keyboards.groups import get_buttons_list
-from bot.keyboards.menu import get_back_btn_kb
-from bot.keyboards.schedule import get_inline_location_kb
 from bot.lexicon import buttons, phrases  # todo: вынести все цитаты
-from bot.states.teacher_schedule import TeacherSchedule
-from bot.utils.ruz.formatting import get_block_for_location
+from bot.keyboards.menu import get_back_btn_kb
+from bot.keyboards.groups import get_buttons_list
 from bot.utils.ruz.lists import get_teachers_list
 from bot.utils.ruz.schedule import get_teacher_location
+from bot.states.teacher_schedule import TeacherSchedule
+from bot.keyboards.schedule import get_inline_location_kb
+from bot.utils.ruz.formatting import get_block_for_location
 
 router = Router()
 
