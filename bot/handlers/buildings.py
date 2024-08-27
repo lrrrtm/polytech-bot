@@ -16,9 +16,6 @@ db = Database()
 
 @router.message(BuildingsItem.waiting_for_building, F.text == buttons.lexicon['back_btn'])
 async def back_btn_to_main_menu(message: Message, state: FSMContext):
-    await message.answer(
-        text="Выбор корпуса отменён.",
-    )
     await cmd_menu(message, state)
 
 
@@ -28,7 +25,7 @@ async def menu_buildings(message: Message, state: FSMContext):
     await state.set_state(BuildingsItem.waiting_for_building)
     buildings_list = db.get_all_places_names()
     await message.answer(
-        text="<b>Выберете корпус:</b>",
+        text="Выбери необходимый учебный корпус корпус из списка",
         reply_markup=get_buildings_kb(buildings_list),
     )
 
@@ -44,7 +41,6 @@ async def msg_building(message: Message, state: FSMContext):
             reply_markup=kb
         )
     except Exception as e:
-        print(f"Ошибка в получение данных о корпусе: {e}")
         await message.answer(
             text="<b>Ошибка при поиске корпуса!</b>",
         )
