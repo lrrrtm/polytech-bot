@@ -19,7 +19,7 @@ def get_buildings_kb(buildings_list: list[str]) -> ReplyKeyboardMarkup:
 
 def get_building_inline_kb(place_info: Location) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="Маршрут", url=f'https://yandex.ru/maps/-/{place_info.yandex_maps_id}'))
+    builder.row(InlineKeyboardButton(text="Открыть в Яндекс.Картах", url=f'https://yandex.ru/maps/-/{place_info.yandex_maps_id}'))
     # todo: сейчас блок обработки ошибок, но в будущем когда в базе будут необходимые поля данных,
     #  то и заменить блок на if not None (добавить проверку в методы Database):
     try:
