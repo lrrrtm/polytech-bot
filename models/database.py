@@ -79,10 +79,41 @@ class Database:
         self.db_reconnect()
         return self.session.query(Location).filter_by(name=place_name).first()
 
+    def get_all_places_names(self) -> list[str]:
+        self.db_reconnect()
+        return [location.name for location in self.session.query(Location.name).all()]
+
+    def get_building_map_id(self, place_name) -> str:
+        self.db_reconnect()
+        return self.session.query(Location.yandex_maps_id).filter_by(name=place_name).first()
+
     def get_user_notifications_statuses(self, tid: int) -> Notifications:
         self.db_reconnect()
         return self.session.query(Notifications).filter_by(tid=tid).first()
 
-    def update_user_notification_status(self, tid: int, status, value: bool):
+    def update_user_notification_statuses(self, tid: int, schedule_update, lesson_reminder, service_message):
+        data = {
+            'schedule_corrections': schedule_update,
+            'schedule_notify': lesson_reminder,
+            'service_msgs': service_message,
+        }
         self.db_reconnect()
-        self.session.query(Notifications).filter_by(tid=tid).update()
+        self.session.query(Notifications).filter_by(tid=tid).update(data)
+        self.session.commit()
+
+    def edit_user_name(self, tid: int, name: str):
+        data = {
+            'name': name
+        }
+        self.db_reconnect()
+        self.session.query(User).filter_by(tid=tid).update(data)
+        self.session.commit()
+
+    def edit_user_group(self, tid: int, faculty: int, group: int):
+        data = {
+            'faculty': faculty,
+            'group': group
+        }
+        self.db_reconnect()
+        self.session.query(User).filter_by(tid=tid).update(data)
+        self.session.commit()

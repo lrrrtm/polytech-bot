@@ -17,8 +17,7 @@ def get_menu_kb() -> ReplyKeyboardMarkup:
         KeyboardButton(text=buttons.lexicon['menu_find_teacher'])
     )
     builder.row(
-        KeyboardButton(text=buttons.lexicon['menu_settings']),
-        KeyboardButton(text=buttons.lexicon['menu_next']),
+        KeyboardButton(text=buttons.lexicon['menu_settings'])
     )
     return builder.as_markup(resize_keyboard=True)
 
@@ -29,7 +28,7 @@ def get_settings_btn_kb(user_id: int, access_token: str) -> InlineKeyboardMarkup
     builder.button(
         text="Открыть найстройки",
         web_app=WebAppInfo(
-            url=f"{getenv('CONTROL_PANEL_URL')}/settings?uid={user_id}&token={access_token}"
+            url=f"{getenv('WEBAPP_URL')}/settings?uid={user_id}&token={access_token}"
         )
     )
 

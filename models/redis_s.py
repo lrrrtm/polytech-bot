@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Redis:
     def __init__(self):
         self.connection = None
@@ -16,9 +17,9 @@ class Redis:
             db=getenv('REDIS_DB'),
         )
 
-    def set_value(self, key: str, value, ttl=-1):
+    def set_value(self, key: str, value):
         self.reconnect()
-        self.connection.set(key, value, ttl)
+        self.connection.set(key, value, 30)
 
     def get_value(self, key: str):
         self.reconnect()
@@ -26,7 +27,3 @@ class Redis:
 
     def set_user_settings_token(self, user_id: int, token: str):
         self.set_value(str(user_id), token, ttl=30)
-
-
-rd = Redis()
-print(rd.get_value('409801981'))
