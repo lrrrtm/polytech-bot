@@ -9,6 +9,7 @@ from bot.lexicon import buttons
 from bot.states.buildings import BuildingsItem
 
 from models.database import Database
+from utils.errors_reactions import error_handler
 
 router = Router()
 db = Database()
@@ -41,6 +42,10 @@ async def msg_building(message: Message, state: FSMContext):
             reply_markup=kb
         )
     except Exception as e:
+        error_handler.answer_to_error(
+            error_msg=str(e),
+            tid=message.from_user.id
+        )
         await message.answer(
             text="<b>Ошибка при поиске корпуса!</b>",
         )
