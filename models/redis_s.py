@@ -26,7 +26,3 @@ class Redis:
 
     def set_user_settings_token(self, user_id: int, token: str):
         self.set_value(str(user_id), token, ttl=30)
-
-
-rd = Redis()
-print(rd.get_value('409801981'))
