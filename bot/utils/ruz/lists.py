@@ -38,4 +38,4 @@ def get_teachers_list(search_query: str):
         if all(part in name for part in query_parts):
             matches.append(teacher)
 
-    return True, matches
+    return matches
