@@ -7,3 +7,5 @@ SQLAlchemy~=2.0.32
 redis~=5.0.8
 selenium~=4.23.1
 Flask~=3.0.3
+PyMySQL~=1.1.1
+cryptography~=43.0.0
