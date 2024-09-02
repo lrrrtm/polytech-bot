@@ -14,6 +14,7 @@ class Redis:
         self.connection = redis_server.StrictRedis(
             host=getenv('REDIS_HOST'),
             port=getenv('REDIS_PORT'),
+            password=getenv('REDIS_PASSWORD'),
             db=getenv('REDIS_DB'),
         )
 
