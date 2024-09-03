@@ -3,12 +3,11 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from bot.keyboards.menu import (get_menu_kb, get_back_btn_kb, get_settings_btn_kb)
+from bot.keyboards.menu import (get_menu_kb, get_back_btn_kb)
 from bot.keyboards.schedule import get_schedule_kb
 from bot.lexicon import phrases, buttons
 from bot.states.teacher_schedule import TeacherSchedule
 from bot.states.menu import MenuItem
-from bot.utils.aceess_tokens import get_aceess_token_for_settings
 from models.redis_s import Redis
 
 router = Router()
@@ -21,7 +20,7 @@ async def cmd_menu(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text=phrases.lexicon['cmd_menu'],
-        reply_markup=get_menu_kb()
+        reply_markup=get_menu_kb(message.from_user.id)
     )
 
 
@@ -43,18 +42,3 @@ async def menu_find_teacher(message: Message, state: FSMContext):
         text=phrases.lexicon['menu_find_teacher'],
         reply_markup=get_back_btn_kb()
     )
-
-
-@router.message(Command("settings"))
-@router.message(F.text == buttons.lexicon['menu_settings'])
-async def menu_settings(message: Message):
-    token = get_aceess_token_for_settings(message.from_user.id)
-    rd.set_value(str(message.from_user.id), token)
-    await message.answer(
-        text=phrases.lexicon['cmd_settings'],
-        reply_markup=get_settings_btn_kb(
-            user_id=message.from_user.id,
-            access_token=token
-        )
-    )
-
