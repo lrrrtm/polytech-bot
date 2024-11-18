@@ -13,8 +13,6 @@ TEACHER_SCHEDULE_URL = "https://ruz.spbstu.ru/teachers/{0}?date={1}"
 AUDITORY_SCHEDULE_URL = "https://ruz.spbstu.ru{0}?date={1}"
 
 
-# todo: получить href аудитории
-
 class ScheduleElementAuditory(BaseModel):
     """Описывает информацию по аудитории элемента расписания"""
 
@@ -104,7 +102,6 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
     )
 
     if page.status_code == 200:
-
         week_schedule = WeekScheduleElement(
             timing=ScheduleElementTiming()
         )
@@ -112,6 +109,7 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
         soup = BeautifulSoup(page.text, "html.parser")
         schedule_days = soup.find_all('li', class_='schedule__day')
 
+        # проходимся по всем дням в текущей неделе
         for index, day in enumerate(schedule_days):
 
             time = day.find('div', class_='schedule__date')
@@ -128,6 +126,7 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
                 )
             )
 
+            # задаём дату начала и дату окончания недели по первому и последнему дню
             if index == 0:
                 week_schedule.timing.start_date = day_date_formatted
             elif index == len(schedule_days) - 1:
@@ -162,11 +161,16 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
                 lesson_type = lesson.find('div', class_='lesson__type')
 
                 lesson_teacher = lesson.find('div', class_='lesson__teachers')
-                lesson_teacher = lesson_teacher.text.strip() if lesson_teacher and len(
-                    lesson_teacher.text.strip().split(' ')) > 1 else None
 
-                lesson_teacher_link = lesson.find('div', class_='lesson__link').find('a')['href'] if lesson.find('div',
-                                                                                                                 class_='lesson__link') else None
+                if lesson_teacher and len(lesson_teacher.text.strip().split(' ')) > 1:
+                    lesson_teacher_link = TEACHER_SCHEDULE_URL.format(
+                        lesson_teacher.find('a', class_='lesson__link').get('href').split('/')[-1],
+                        day_date_formatted
+                    )
+                    lesson_teacher = lesson_teacher.text.strip()
+                else:
+                    lesson_teacher_link = None
+                    lesson_teacher = None
 
                 f_teacher = ScheduleElementTeacher(
                     name=lesson_teacher,
