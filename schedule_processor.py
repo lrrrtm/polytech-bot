@@ -246,12 +246,12 @@ if __name__ == "__main__":
         volume='group',
         volume_data={
             'faculty': 125,
-            'group': 40387,
+            'group': 40518,
         },
         request_date=datetime.date(
             year=2024,
             month=11,
-            day=18
+            day=20
         )
     )
 
