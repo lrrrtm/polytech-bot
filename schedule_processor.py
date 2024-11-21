@@ -1,7 +1,7 @@
 # Процессор для получения информации о расписании группы или преподавателя
 # Для запуска необходимы beautifulsoup4, pydantic, requests
 
-from typing import List
+from typing import List, Dict
 import requests
 
 from bs4 import BeautifulSoup
@@ -44,11 +44,11 @@ class ScheduleElementLink(BaseModel):
 class ScheduleElement(BaseModel):
     """Описывает элемент расписания"""
 
-    name: str
-    type: str
+    name: str | None
+    type: str | None
     timing: ScheduleElementTiming
-    teacher: ScheduleElementTeacher
-    auditory: ScheduleElementAuditory
+    teacher: ScheduleElementTeacher | None
+    auditory: ScheduleElementAuditory | None
     links: List[ScheduleElementLink] = []
 
 
@@ -82,6 +82,19 @@ months_captions = {
 }
 
 
+def get_week_dates_list(request_date: datetime.date) -> dict:
+    """
+    Возвращает список дат недели по заданному дню
+    :param request_date:
+    :return: datetime.date понедельника
+    """
+    start_of_week = request_date - datetime.timedelta(days=request_date.weekday())
+
+    week_dates = {start_of_week + datetime.timedelta(days=i): False for i in range(7)}
+
+    return week_dates
+
+
 def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.date) -> WeekScheduleElement | None:
     """
     Получает всё расписание на всю неделю по заданной дате
@@ -90,6 +103,8 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
     :param volume_data: словарь данных {teacher_id: int} или {faculty: int, group: int}
     :return: WeekScheduleElement | None
     """
+
+    week_days = get_week_dates_list(request_date=request_date)
 
     if volume == 'group':
         url = GROUP_SCHEDULE_URL.format(volume_data['faculty'], volume_data['group'], request_date.strftime('%Y-%m-%d'))
@@ -118,6 +133,12 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
                 month=int(months_captions[time.text.split(' ')[1][:-1]]),
                 day=int(time.text.split(' ')[0]),
             )
+
+            # print(day_date_formatted, week_days)
+            if day_date_formatted in week_days.keys():
+                week_days[day_date_formatted] = True
+            else:
+                print(f"{day_date_formatted} not in {week_days.keys()}")
 
             day_schedule_element = DayScheduleElement(
                 timing=ScheduleElementTiming(
@@ -208,8 +229,18 @@ def fetch_week_schedule(volume: str, volume_data: dict, request_date: datetime.d
 
                 day_schedule_element.lessons.append(f_lesson)
 
-            week_schedule.days.append(day_schedule_element)
+        for date, is_exist in week_days.items():
+            if is_exist is False:
+                week_schedule.days.append(
+                    DayScheduleElement(
+                        timing=ScheduleElementTiming(
+                            start_date=date,
+                            end_date=date
+                        )
+                    )
+                )
 
+        week_schedule.days.sort(key=lambda x: x.timing.start_date)
         return week_schedule
 
     return None
@@ -251,7 +282,7 @@ if __name__ == "__main__":
         request_date=datetime.date(
             year=2024,
             month=11,
-            day=20
+            day=24
         )
     )
 
@@ -268,7 +299,7 @@ if __name__ == "__main__":
         request_date=datetime.date(
             year=2024,
             month=11,
-            day=18
+            day=24
         )
     )
 
