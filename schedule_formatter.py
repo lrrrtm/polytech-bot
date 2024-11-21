@@ -35,7 +35,7 @@ class ScheduleFormatter:
                      f"{day_schedule.timing.start_date.strftime('%d.%m.%y')} "
                      f"({day_schedule.timing.start_date.strftime('%A')})\n")
 
-        return day_title + "\n" + "\n\n".join(formatted_lessons)
+        return f"{day_title}\n{"\n\n".join(formatted_lessons)}"
 
     @staticmethod
     def format_lesson(lesson: ScheduleElement) -> str:
@@ -62,7 +62,8 @@ class ScheduleFormatter:
         # Ссылки
         links = ""
         if lesson.links:
-            links_list = "\n".join([f"{emoji.emojize(":link:")} [{link.title}]({link.url})" for link in lesson.links])  # todo: проследить, что сообщение отправляется в markdown
+            links_list = "\n".join([f"{emoji.emojize(":link:")} <A href=\"{link.url}\">{link.title}</A>"
+                                    for link in lesson.links])
             links = f"\n{links_list}"
 
         return f"{emoji.emojize(":alarm_clock:")} {time_range} {name_and_type}\n{teacher}\n{auditory}{links}"
