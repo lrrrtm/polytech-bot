@@ -23,17 +23,18 @@ class ScheduleFormatter:
         :param day_schedule: Объект расписания на день.
         :return: Отформатированное расписание.
         """
-        if not day_schedule.lessons:
-            return "На этот день занятий нет."
-
-        formatted_lessons = []
-        for lesson in day_schedule.lessons:
-            formatted_lessons.append(ScheduleFormatter.format_lesson(lesson))
 
         # Заголовок с датой
         day_title = (f"{emoji.emojize(":calendar:")} Расписание на "
                      f"{day_schedule.timing.start_date.strftime('%d.%m.%y')} "
                      f"({day_schedule.timing.start_date.strftime('%A')})\n")
+
+        if not day_schedule.lessons:
+            return f"{day_title}\nНа этот день занятий нет"
+
+        formatted_lessons = []
+        for lesson in day_schedule.lessons:
+            formatted_lessons.append(ScheduleFormatter.format_lesson(lesson))
 
         return f"{day_title}\n{"\n\n".join(formatted_lessons)}"
 
@@ -81,7 +82,7 @@ if __name__ == '__main__':
         request_date=datetime.date(
             year=2024,
             month=11,
-            day=20
+            day=24
         )
     )
 
